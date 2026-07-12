@@ -2,6 +2,8 @@
 import type { CollectionEntry } from 'astro:content';
 const { post, featured = false } = Astro.props as { post: CollectionEntry<'posts'>; featured?: boolean };
 const date = post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+const category = post.data.category ?? post.data.course;
+const categoryCode = post.data.categoryCode ?? post.data.courseCode;
 ---
 
 <article class:list={{ row: true, featured }}>
@@ -13,11 +15,11 @@ const date = post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month
     <h3>{post.data.title}</h3>
     <p>{post.data.description}</p>
     <div class="tags">
-      {post.data.course && <span class="course">{post.data.course}</span>}
+      {category && <span class="course">{category}</span>}
       {post.data.tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
     </div>
   </a>
-  {featured && <div class="course-plate" aria-hidden="true"><span>{post.data.courseCode ?? 'NOTE'}</span><strong>{post.data.course ?? '学习记录'}</strong></div>}
+  {featured && <div class="course-plate" aria-hidden="true"><span>{categoryCode ?? 'NOTE'}</span><strong>{category ?? post.data.series ?? '学习记录'}</strong></div>}
 </article>
 
 <style>

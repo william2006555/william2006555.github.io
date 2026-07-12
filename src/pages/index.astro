@@ -5,7 +5,7 @@ import PostRow from '../components/PostRow.astro';
 import { site } from '../site.config';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const courses = [...new Set(posts.map((post) => post.data.course).filter(Boolean))];
+const categories = [...new Set(posts.map((post) => post.data.category ?? post.data.course).filter(Boolean))];
 ---
 
 <BaseLayout>
@@ -18,7 +18,7 @@ const courses = [...new Set(posts.map((post) => post.data.course).filter(Boolean
     </div>
     <div class="index-board" aria-label="内容统计">
       <div><strong>{String(posts.length).padStart(2, '0')}</strong><span>篇内容</span></div>
-      <div><strong>{String(courses.length).padStart(2, '0')}</strong><span>门课程</span></div>
+      <div><strong>{String(categories.length).padStart(2, '0')}</strong><span>个分类</span></div>
       <p>LAST UPDATED<br /><time>{posts[0]?.data.date.toLocaleDateString('zh-CN') ?? '即将开始'}</time></p>
     </div>
   </section>
@@ -32,8 +32,8 @@ const courses = [...new Set(posts.map((post) => post.data.course).filter(Boolean
 
   <section class="course-band">
     <div class="shell course-inner">
-      <div><p class="eyebrow">COURSE INDEX</p><h2 class="section-title">按课程进入</h2><p>比标签更稳定的学习路径。每门课程都可以逐章积累，最后整理成完整文章。</p></div>
-      <div class="course-list">{courses.map((course, index) => <a href={`/courses#${course}`}><span>{String(index + 1).padStart(2, '0')}</span><strong>{course}</strong><i>→</i></a>)}</div>
+      <div><p class="eyebrow">CATEGORY INDEX</p><h2 class="section-title">按分类进入</h2><p>课程笔记、会议游记、项目复盘和长期主题，都可以在这里形成各自的路径。</p></div>
+      <div class="course-list">{categories.map((category, index) => <a href={`/courses#${category}`}><span>{String(index + 1).padStart(2, '0')}</span><strong>{category}</strong><i>→</i></a>)}</div>
     </div>
   </section>
 </BaseLayout>

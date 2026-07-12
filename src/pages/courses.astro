@@ -2,11 +2,11 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const grouped = Object.entries(Object.groupBy(posts.filter((post) => post.data.course), (post) => post.data.course!));
+const grouped = Object.entries(Object.groupBy(posts.filter((post) => post.data.category ?? post.data.course), (post) => (post.data.category ?? post.data.course)!));
 ---
-<BaseLayout title="课程">
-  <header class="page-head shell"><p class="eyebrow">COURSE INDEX</p><h1>课程索引</h1><p>按课程聚合学习过程，而不是让笔记散落在时间线里。</p></header>
-  <div class="shell courses">{grouped.map(([course, items], index) => <section id={course}><div class="course-title"><span>{String(index + 1).padStart(2, '0')}</span><h2>{course}</h2><small>{items?.length} 篇</small></div><div>{items?.map((post) => <a href={`/blog/${post.id}`}><time>{post.data.date.toLocaleDateString('zh-CN')}</time><strong>{post.data.title}</strong><span>→</span></a>)}</div></section>)}</div>
+<BaseLayout title="分类">
+  <header class="page-head shell"><p class="eyebrow">CATEGORY INDEX</p><h1>分类索引</h1><p>按主题、课程、会议或项目整理内容，不把所有文章都塞进同一种盒子里。</p></header>
+  <div class="shell courses">{grouped.map(([category, items], index) => <section id={category}><div class="course-title"><span>{String(index + 1).padStart(2, '0')}</span><h2>{category}</h2><small>{items?.length} 篇</small></div><div>{items?.map((post) => <a href={`/blog/${post.id}`}><time>{post.data.date.toLocaleDateString('zh-CN')}</time><strong>{post.data.title}</strong><span>→</span></a>)}</div></section>)}</div>
 </BaseLayout>
 <style>
   .page-head { padding: 76px 0 48px; }
