@@ -6,6 +6,7 @@ course: 操作系统
 courseCode: CS-OS
 tags: [系统调用, 内核, 课程笔记]
 kind: article
+draft: true
 ---
 
 操作系统课程最容易让人迷失在名词里。这一篇先只抓住一个问题：**应用程序如何请求操作系统替它完成工作？**

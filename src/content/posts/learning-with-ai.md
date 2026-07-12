@@ -6,6 +6,7 @@ course: 学习方法
 courseCode: META
 tags: [AI, Obsidian, 写作]
 kind: article
+draft: true
 ---
 
 我希望学习过程最终能留下可以再次使用的东西，而不是只留下几张聊天截图。

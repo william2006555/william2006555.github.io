@@ -6,6 +6,7 @@ course: 建站记录
 courseCode: WEB-01
 tags: [Astro, 博客, Markdown]
 kind: note
+draft: true
 ---
 
 这次继续选择 Astro，并不是因为它最流行，而是因为它允许日常写作保持简单。

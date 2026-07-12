@@ -6,6 +6,7 @@ course: 开发工具
 courseCode: TOOL
 tags: [Git, 速查]
 kind: note
+draft: true
 ---
 
 ## 三个位置
