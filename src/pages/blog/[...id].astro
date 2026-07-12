@@ -1,28 +1,42 @@
 ---
-import { type CollectionEntry, render } from 'astro:content'
-
-import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
-import PostLayout from '@/layouts/BlogPost.astro'
-
-export const prerender = true
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = sortMDByDate(await getBlogCollection())
-  return posts.map((post) => ({
-    params: { id: post.id },
-    props: { post, posts }
-  }))
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
 }
 
-type Props = {
-  post: CollectionEntry<'blog'>
-  posts: CollectionEntry<'blog'>[]
-}
-
-const { post, posts } = Astro.props
-const { Content, headings, remarkPluginFrontmatter } = await render(post)
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const date = post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
-
-<PostLayout {post} {posts} {headings} {remarkPluginFrontmatter}>
-  <Content />
-</PostLayout>
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article>
+    <header class="article-head shell">
+      <div class="article-kicker">{post.data.course ?? (post.data.kind === 'note' ? '随手笔记' : '文章')}</div>
+      <h1>{post.data.title}</h1>
+      <p class="description">{post.data.description}</p>
+      <div class="article-meta"><time datetime={post.data.date.toISOString()}>{date}</time><span>{post.data.kind === 'note' ? '持续更新' : '完整文章'}</span>{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
+    </header>
+    <div class="article-grid shell">
+      <aside>{headings.length > 0 && <><p>目录</p><nav>{headings.filter((h) => h.depth <= 3).map((h) => <a class={`depth-${h.depth}`} href={`#${h.slug}`}>{h.text}</a>)}</nav></>}</aside>
+      <div class="prose"><Content /></div>
+    </div>
+  </article>
+</BaseLayout>
+<style>
+  .article-head { padding: 74px 0 46px; text-align: center; }
+  .article-kicker { margin-bottom: 18px; color: var(--warm); font-size: .8rem; font-weight: 750; }
+  h1 { max-width: 900px; margin: 0 auto; font-family: ui-serif, Georgia, "Noto Serif SC", serif; font-size: clamp(2.3rem, 6vw, 4.5rem); line-height: 1.18; }
+  .description { max-width: 680px; margin: 22px auto; color: var(--muted); }
+  .article-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; color: var(--muted); font-size: .78rem; }
+  .article-grid { display: grid; grid-template-columns: 180px minmax(0, 720px) 180px; gap: 36px; align-items: start; }
+  aside { position: sticky; top: 96px; grid-column: 1; font-size: .78rem; }
+  aside p { margin: 0 0 10px; font-weight: 750; }
+  aside nav { display: flex; flex-direction: column; gap: 7px; border-left: 1px solid var(--line); }
+  aside a { padding-left: 12px; color: var(--muted); line-height: 1.4; }
+  aside .depth-3 { padding-left: 24px; }
+  .prose { grid-column: 2; width: 100%; }
+  @media (max-width: 960px) { .article-grid { display: block; } aside { display: none; } }
+</style>

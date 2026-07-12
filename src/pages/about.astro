@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site.config';
+---
+<BaseLayout title="关于">
+  <section class="about shell">
+    <div class="portrait" aria-hidden="true"><span>W</span><small>EST. 2026</small></div>
+    <div><p class="eyebrow">ABOUT</p><h1>你好，我是 {site.name}。</h1><p class="lead">我正在学习、写代码，也试着把零散的理解整理成可以被未来的自己重新使用的东西。</p><div class="facts"><p><span>这里会写</span>课程笔记、项目复盘、工具与技术实践</p><p><span>写作方式</span>在 VS Code 中编辑 Markdown 文件</p><p><span>联系方式</span>{site.email}</p></div><p>这一页之后可以换成你的正式自我介绍。第一版先让结构和阅读体验跑起来，再慢慢补充个人照片、经历和项目。</p></div>
+  </section>
+</BaseLayout>
+<style>
+  .about { min-height: 650px; display: grid; grid-template-columns: 320px minmax(0, 620px); justify-content: center; gap: 80px; padding-block: 90px; }
+  .portrait { aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: space-between; padding: 28px; background: var(--accent); color: #fff; }
+  .portrait span { font: 7rem/1 ui-serif, Georgia, serif; }
+  .portrait small { font: .75rem ui-monospace, monospace; }
+  h1 { margin: 0; font: 650 clamp(2.5rem, 6vw, 4.5rem)/1.12 ui-serif, Georgia, "Noto Serif SC", serif; }
+  .lead { margin: 24px 0 40px; font-size: 1.15rem; color: var(--muted); }
+  .facts { margin-bottom: 36px; border-top: 1px solid var(--line); }
+  .facts p { display: grid; grid-template-columns: 100px 1fr; gap: 18px; margin: 0; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .facts span { color: var(--muted); font-size: .8rem; }
+  @media (max-width: 760px) { .about { grid-template-columns: 1fr; gap: 46px; padding-block: 60px; } .portrait { width: min(70vw, 300px); } }
+</style>

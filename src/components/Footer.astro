@@ -1,0 +1,16 @@
+---
+import { site } from '../site.config';
+---
+<footer>
+  <div class="shell footer-inner">
+    <p>把学到的东西留下来。</p>
+    <div><a href="/rss.xml">RSS</a><span>·</span><a href={site.github} target="_blank" rel="noreferrer">GitHub</a></div>
+  </div>
+</footer>
+
+<style>
+  footer { margin-top: 90px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+  .footer-inner { min-height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  p { margin: 0; }
+  div div { display: flex; gap: 10px; }
+</style>

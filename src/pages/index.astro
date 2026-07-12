@@ -1,87 +1,70 @@
 ---
-import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import { site } from '../site.config';
 
-import { Quote } from 'astro-pure/advanced'
-import { PostPreview } from 'astro-pure/components/pages'
-import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
-import { Button, Card, Icon, Label } from 'astro-pure/user'
-import PageLayout from '@/layouts/BaseLayout.astro'
-import ProjectCard from '@/components/home/ProjectCard.astro'
-import Section from '@/components/home/Section.astro'
-import SkillLayout from '@/components/home/SkillLayout.astro'
-import config from '@/site-config'
-
-const languages = ['Html', 'JavaScript', 'CSS', 'Shell']
-const frontend = ['TypeScript', 'Vite', 'Webpack', 'Astro']
-const backend = ['Vercel', 'Waline']
-
-const MAX_POSTS = 10
-const allPosts = await getBlogCollection()
-const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
-
-const imagePath = config.logo.src
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/*.{jpeg,jpg,png,gif,avif,webp}'
-)
-if (!images[imagePath])
-  throw new Error(
-    `"${imagePath}" does not exist in glob: "src/assets/*.{jpeg,jpg,png,gif,avif,webp}"`
-  )
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const courses = [...new Set(posts.map((post) => post.data.course).filter(Boolean))];
 ---
 
-<PageLayout meta={{ title: 'Home' }} highlightColor='#659EB9'>
-  <main class='flex w-full flex-col items-center'>
-    <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
-      <Image
-        src={images[imagePath]()}
-        alt={config.logo.alt || 'Profile'}
-        class='h-28 w-auto rounded-full border p-1'
-        loading='eager'
-        fetchpriority='high'
-      />
-
-      <div class='flex flex-col items-center gap-y-4'>
-        <h1 class='text-3xl font-medium'>{config.author}</h1>
-        <div class='flex flex-wrap justify-center gap-x-7 gap-y-3'>
-          <Label title='Somewhere'>
-            <Icon name='location' class='size-5' slot='icon' />
-          </Label>
-          <Label
-            title='Github'
-            as='a'
-            href='https://github.com/william2006555'
-            target='_blank'
-          >
-            <Icon name='github' class='size-5' slot='icon' />
-          </Label>
-        </div>
-      </div>
-    </section>
-
-    <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
-      <!-- <Section title='About'>
-        <p class='text-muted-foreground'>Computer Science Student @ University</p>
-        <p class='text-muted-foreground'>
-          Welcome to my personal blog. I am a CS sophomore interested in C++, Python, and now, web development. 
-          Here I share my learning notes and thoughts on technology.
-        </p>
-        <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
-      </Section> -->
-      {
-        allPostsByDate.length > 0 && (
-          <Section title='Posts'>
-            <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
-              {allPostsByDate.map((p) => (
-                <li class='flex flex-col gap-x-2 sm:flex-row'>
-                  <PostPreview post={p} />
-                </li>
-              ))}
-            </ul>
-            <Button title='More posts' class='w-fit self-end' href='/blog' variant='ahead' />
-          </Section>
-        )
-      }
+<BaseLayout>
+  <section class="hero shell">
+    <div class="hero-copy">
+      <p class="eyebrow">STUDY · BUILD · WRITE</p>
+      <h1>{site.headline}</h1>
+      <p class="intro">{site.introduction}</p>
+      <div class="hero-links"><a class="button-link" href="/blog">开始阅读</a><a href="/about">关于我</a></div>
     </div>
-    <Quote class='mt-12' />
-  </main>
-</PageLayout>
+    <div class="index-board" aria-label="内容统计">
+      <div><strong>{String(posts.length).padStart(2, '0')}</strong><span>篇内容</span></div>
+      <div><strong>{String(courses.length).padStart(2, '0')}</strong><span>门课程</span></div>
+      <p>LAST UPDATED<br /><time>{posts[0]?.data.date.toLocaleDateString('zh-CN') ?? '即将开始'}</time></p>
+    </div>
+  </section>
+
+  {posts[0] && <section class="shell feature"><div class="section-head"><div><p class="eyebrow">CURRENTLY LEARNING</p><h2 class="section-title">最近在学</h2></div></div><PostRow post={posts[0]} featured /></section>}
+
+  <section class="shell recent">
+    <div class="section-head"><div><p class="eyebrow">RECENT WRITING</p><h2 class="section-title">最近更新</h2></div><a class="section-link" href="/blog">查看全部 →</a></div>
+    <div>{posts.slice(1, 6).map((post) => <PostRow post={post} />)}</div>
+  </section>
+
+  <section class="course-band">
+    <div class="shell course-inner">
+      <div><p class="eyebrow">COURSE INDEX</p><h2 class="section-title">按课程进入</h2><p>比标签更稳定的学习路径。每门课程都可以逐章积累，最后整理成完整文章。</p></div>
+      <div class="course-list">{courses.map((course, index) => <a href={`/courses#${course}`}><span>{String(index + 1).padStart(2, '0')}</span><strong>{course}</strong><i>→</i></a>)}</div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero { min-height: 520px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .7fr); align-items: center; gap: 80px; padding-block: 80px; }
+  h1 { max-width: 700px; margin: 0; font-family: ui-serif, Georgia, "Noto Serif SC", serif; font-size: clamp(3rem, 8vw, 6rem); font-weight: 650; line-height: 1.02; letter-spacing: 0; }
+  .intro { max-width: 630px; margin: 28px 0; color: var(--muted); font-size: 1.04rem; }
+  .hero-links { display: flex; gap: 28px; align-items: center; font-size: .9rem; }
+  .index-board { border-top: 4px solid var(--text); border-bottom: 1px solid var(--line); }
+  .index-board div { display: flex; align-items: baseline; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .index-board strong { font-family: ui-serif, Georgia, serif; font-size: 2.8rem; line-height: 1; }
+  .index-board span, .index-board p { color: var(--muted); font-size: .75rem; }
+  .index-board p { margin: 18px 0; font-family: ui-monospace, monospace; line-height: 1.7; }
+  .feature, .recent { padding-block: 54px; }
+  .course-band { margin-top: 60px; padding: 70px 0; background: var(--text); color: var(--bg); }
+  .course-inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; }
+  .course-inner > div > p:last-child { max-width: 420px; color: color-mix(in srgb, var(--bg) 65%, transparent); }
+  .course-list { border-top: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
+  .course-list a { display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: center; padding: 18px 0; border-bottom: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
+  .course-list span { font: .72rem ui-monospace, monospace; opacity: .6; }
+  .course-list strong { font-size: 1rem; }
+  .course-list i { font-style: normal; }
+  @media (max-width: 760px) {
+    .hero { min-height: auto; grid-template-columns: 1fr; gap: 28px; padding-block: 42px 34px; }
+    h1 { font-size: clamp(2.85rem, 14vw, 4.4rem); }
+    .intro { margin: 18px 0; }
+    .index-board div { padding: 10px 0; }
+    .index-board strong { font-size: 2.15rem; }
+    .index-board p { margin: 10px 0; }
+    .feature { padding-top: 34px; }
+    .course-inner { grid-template-columns: 1fr; gap: 36px; }
+  }
+</style>

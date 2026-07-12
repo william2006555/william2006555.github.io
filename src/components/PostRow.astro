@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+const { post, featured = false } = Astro.props as { post: CollectionEntry<'posts'>; featured?: boolean };
+const date = post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<article class:list={{ row: true, featured }}>
+  <a class="row-main" href={`/blog/${post.id}`}>
+    <div class="meta">
+      <time datetime={post.data.date.toISOString()}>{date}</time>
+      {post.data.kind === 'note' && <span class="kind">随记</span>}
+    </div>
+    <h3>{post.data.title}</h3>
+    <p>{post.data.description}</p>
+    <div class="tags">
+      {post.data.course && <span class="course">{post.data.course}</span>}
+      {post.data.tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
+    </div>
+  </a>
+  {featured && <div class="course-plate" aria-hidden="true"><span>{post.data.courseCode ?? 'NOTE'}</span><strong>{post.data.course ?? '学习记录'}</strong></div>}
+</article>
+
+<style>
+  .row { padding: 24px 0; border-top: 1px solid var(--line); }
+  .row-main { display: block; }
+  .meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; color: var(--muted); font-size: .76rem; }
+  .kind { padding: 1px 7px; background: var(--accent-soft); color: var(--accent); border-radius: 3px; }
+  h3 { margin: 0; font-family: ui-serif, Georgia, "Noto Serif SC", serif; font-size: 1.28rem; line-height: 1.45; }
+  p { max-width: 740px; margin: 6px 0 10px; color: var(--muted); font-size: .9rem; line-height: 1.65; }
+  .tags { display: flex; flex-wrap: wrap; align-items: center; }
+  .course { margin-right: 12px; color: var(--warm); font-size: .78rem; font-weight: 700; }
+  .featured { display: grid; grid-template-columns: minmax(0, 1fr) 210px; align-items: stretch; gap: 32px; padding: 0; border: 1px solid var(--line); background: var(--surface); }
+  .featured .row-main { padding: 30px; }
+  .featured h3 { font-size: 1.55rem; }
+  .course-plate { min-height: 190px; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; background: var(--accent); color: #fff; }
+  .course-plate span { font-family: ui-monospace, monospace; font-size: .8rem; }
+  .course-plate strong { font-family: ui-serif, Georgia, "Noto Serif SC", serif; font-size: 1.45rem; line-height: 1.25; }
+  @media (max-width: 680px) {
+    .featured { grid-template-columns: 1fr; }
+    .course-plate { min-height: 112px; }
+  }
+</style>

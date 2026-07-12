@@ -1,0 +1,56 @@
+---
+import { site } from '../site.config';
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/blog', label: '文章' },
+  { href: '/courses', label: '课程' },
+  { href: '/archive', label: '归档' },
+  { href: '/about', label: '关于' },
+];
+---
+
+<header class="header">
+  <div class="shell header-inner">
+    <a class="brand" href="/" aria-label="返回首页">
+      <span class="brand-mark">W</span>
+      <span class="brand-text">{site.title}</span>
+    </a>
+    <nav aria-label="主导航">
+      {nav.map((item) => <a class:list={{ active: path.startsWith(item.href) }} href={item.href}>{item.label}</a>)}
+    </nav>
+    <button id="theme-toggle" class="icon-button" type="button" aria-label="切换深色模式" title="切换深色模式">
+      <span class="theme-icon" aria-hidden="true">◐</span>
+    </button>
+  </div>
+</header>
+
+<script is:inline>
+  const root = document.documentElement;
+  const stored = localStorage.getItem('theme');
+  if (stored) root.dataset.theme = stored;
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+  document.querySelector('#theme-toggle')?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>
+
+<style>
+  .header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent); background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(14px); }
+  .header-inner { min-height: 66px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; width: max-content; font-weight: 760; line-height: 1; }
+  .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; background: var(--text); color: var(--bg); font-family: ui-serif, Georgia, serif; font-size: 1rem; }
+  nav { display: flex; align-items: center; gap: 26px; }
+  nav a { position: relative; color: var(--muted); font-size: .88rem; font-weight: 650; }
+  nav a.active { color: var(--text); }
+  nav a.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -22px; height: 2px; background: var(--accent); }
+  .icon-button { justify-self: end; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; }
+  .theme-icon { font-size: 1.1rem; line-height: 1; }
+  @media (max-width: 760px) {
+    .header-inner { grid-template-columns: 1fr auto; }
+    .brand-text { display: none; }
+    nav { order: 3; grid-column: 1 / -1; justify-content: space-between; width: 100%; padding: 0 4px 10px; gap: 12px; }
+    nav a.active::after { bottom: -11px; }
+  }
+</style>

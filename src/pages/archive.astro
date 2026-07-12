@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const grouped = Object.entries(Object.groupBy(posts, (post) => String(post.data.date.getFullYear()))).sort(([a], [b]) => Number(b) - Number(a));
+---
+<BaseLayout title="归档">
+  <header class="page-head shell"><p class="eyebrow">ARCHIVE</p><h1>归档</h1><p>{posts.length} 篇内容，按写下它们的时间排列。</p></header>
+  <div class="shell archive">{grouped.map(([year, items]) => <section><h2>{year}</h2><div>{items?.map((post) => <a href={`/blog/${post.id}`}><time>{post.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}</time><strong>{post.data.title}</strong><span>{post.data.course ?? post.data.tags[0]}</span></a>)}</div></section>)}</div>
+</BaseLayout>
+<style>
+  .page-head { padding: 76px 0 48px; } h1 { margin: 0; font: 650 clamp(2.7rem, 7vw, 5rem)/1.1 ui-serif, Georgia, serif; } .page-head p:last-child { color: var(--muted); }
+  .archive section { display: grid; grid-template-columns: 150px 1fr; gap: 40px; padding: 34px 0; border-top: 1px solid var(--line); }
+  h2 { margin: 0; font: 600 2rem ui-serif, Georgia, serif; }
+  section a { display: grid; grid-template-columns: 62px 1fr 140px; gap: 20px; padding: 11px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  time, section a span { color: var(--muted); font-size: .76rem; } section a span { text-align: right; }
+  @media (max-width: 680px) { .archive section { grid-template-columns: 1fr; gap: 12px; } section a { grid-template-columns: 52px 1fr; } section a span { display: none; } }
+</style>
