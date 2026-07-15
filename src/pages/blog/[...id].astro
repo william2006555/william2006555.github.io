@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import GiscusComments from '../../components/GiscusComments.astro';
 import { getPostCategory } from '../../lib/taxonomy';
 
 export async function getStaticPaths() {
@@ -31,6 +32,7 @@ const kicker = post.data.series ? `${category} · ${post.data.series}` : categor
       <aside>{headings.length > 0 && <><p>目录</p><nav>{headings.filter((h) => h.depth <= 3).map((h) => <a class={`depth-${h.depth}`} href={`#${h.slug}`}>{h.text}</a>)}</nav></>}</aside>
       <div class="prose"><Content /></div>
     </div>
+    <div class="comments-wrap shell"><GiscusComments /></div>
   </article>
 </BaseLayout>
 <style>
@@ -46,5 +48,8 @@ const kicker = post.data.series ? `${category} · ${post.data.series}` : categor
   aside a { padding-left: 12px; color: var(--muted); line-height: 1.4; }
   aside .depth-3 { padding-left: 24px; }
   .prose { grid-column: 2; width: 100%; }
+  .comments-wrap { display: grid; grid-template-columns: 180px minmax(0, 720px) 180px; gap: 36px; padding-top: 34px; }
+  .comments-wrap :global(.comments) { grid-column: 2; }
   @media (max-width: 960px) { .article-grid { display: block; } aside { display: none; } }
+  @media (max-width: 960px) { .comments-wrap { display: block; } }
 </style>
