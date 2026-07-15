@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPostCategory, primaryCategories } from '../lib/taxonomy';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const grouped = Object.groupBy(posts, (post) => getPostCategory(post.data));
+const extraCategories = [...new Set(posts.map((post) => getPostCategory(post.data)))].filter((name) => !primaryCategories.some((category) => category.name === name));
+const categories = [
+  ...primaryCategories,
+  ...extraCategories.map((name) => ({ name, code: 'EXTRA', description: '还没有纳入固定分类的临时入口。' })),
+];
+---
+
+<BaseLayout title="分类">
+  <header class="page-head shell">
+    <p class="eyebrow">CATEGORY INDEX</p>
+    <h1>分类索引</h1>
+    <p>四个大类负责方向，系列负责连续主题，标签负责具体关键词。</p>
+  </header>
+  <div class="shell categories">
+    {categories.map((category, index) => {
+      const items = grouped[category.name] ?? [];
+      return (
+        <section id={category.name}>
+          <div class="category-title">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <h2>{category.name}</h2>
+            <small>{category.code} · {items.length} 篇</small>
+            <p>{category.description}</p>
+          </div>
+          <div class:list={{ posts: true, empty: items.length === 0 }}>
+            {items.length > 0 ? items.map((post) => (
+              <a href={`/blog/${post.id}`}>
+                <time>{post.data.date.toLocaleDateString('zh-CN')}</time>
+                <strong>{post.data.title}</strong>
+                <em>{post.data.series ?? post.data.tags[0] ?? '文章'}</em>
+                <span>→</span>
+              </a>
+            )) : <p>暂时还没有公开文章。</p>}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head { padding: 76px 0 48px; }
+  h1 { margin: 0; font: 650 clamp(2.7rem, 7vw, 5rem)/1.1 ui-serif, Georgia, "Noto Serif SC", serif; }
+  .page-head > p:last-child { color: var(--muted); }
+  .categories section { scroll-margin-top: 90px; display: grid; grid-template-columns: 300px 1fr; gap: 56px; padding: 38px 0; border-top: 1px solid var(--line); }
+  .category-title { display: grid; grid-template-columns: 32px 1fr; align-items: baseline; }
+  .category-title span { color: var(--warm); font: .75rem ui-monospace, monospace; }
+  .category-title h2 { margin: 0; font: 600 1.45rem/1.3 ui-serif, Georgia, "Noto Serif SC", serif; }
+  .category-title small { grid-column: 2; color: var(--muted); font-size: .72rem; }
+  .category-title p { grid-column: 2; max-width: 220px; margin: 12px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.7; }
+  .posts a { display: grid; grid-template-columns: 110px minmax(0, 1fr) 120px auto; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .posts time, .posts em { color: var(--muted); font-size: .76rem; font-style: normal; }
+  .posts strong { font-size: .9rem; }
+  .empty { display: flex; align-items: center; min-height: 56px; color: var(--muted); font-size: .86rem; border-bottom: 1px solid var(--line); }
+  @media (max-width: 760px) {
+    .categories section { grid-template-columns: 1fr; gap: 18px; }
+    .category-title p { max-width: none; }
+    .posts a { grid-template-columns: 1fr auto; }
+    .posts time, .posts em { grid-column: 1 / -1; }
+  }
+</style>

@@ -4,8 +4,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostRow from '../../components/PostRow.astro';
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
-<BaseLayout title="文章" description="所有文章与学习笔记">
-  <header class="page-head shell"><p class="eyebrow">ALL WRITING</p><h1>文章与笔记</h1><p>正式文章和仍在生长的学习记录，都放在这里。</p></header>
+<BaseLayout title="文章" description="所有文章、记录与学习笔记">
+  <header class="page-head shell"><p class="eyebrow">ALL WRITING</p><h1>文章与笔记</h1><p>正式文章、日常记录和仍在生长的学习笔记，都放在这里。</p></header>
   <section class="shell listing">{posts.map((post) => <PostRow post={post} />)}</section>
 </BaseLayout>
 <style>

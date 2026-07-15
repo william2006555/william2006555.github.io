@@ -2,10 +2,10 @@
 title: ICML 2026 游记
 description: 第一次参加顶会，从首尔会场、Diffusion、World Model 到 Physical Intelligence 的一些现场记录。
 date: 2026-07-12
-category: 会议游记
-categoryCode: ICML-2026
+category: 日常记录
+categoryCode: DAILY
 series: ICML 2026
-tags: [ICML, 机器学习, 具身智能, VLA, Diffusion]
+tags: [ICML, 首尔, 机器学习, 具身智能, VLA, Diffusion]
 kind: article
 ---
 

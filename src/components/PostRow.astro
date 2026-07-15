@@ -1,9 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { getCategoryCode, getPostCategory } from '../lib/taxonomy';
+
 const { post, featured = false } = Astro.props as { post: CollectionEntry<'posts'>; featured?: boolean };
 const date = post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
-const category = post.data.category ?? post.data.course;
-const categoryCode = post.data.categoryCode ?? post.data.courseCode;
+const category = getPostCategory(post.data);
+const categoryCode = getCategoryCode(post.data);
 ---
 
 <article class:list={{ row: true, featured }}>
@@ -15,11 +17,12 @@ const categoryCode = post.data.categoryCode ?? post.data.courseCode;
     <h3>{post.data.title}</h3>
     <p>{post.data.description}</p>
     <div class="tags">
-      {category && <span class="course">{category}</span>}
+      <span class="category">{category}</span>
+      {post.data.series && <span class="series">{post.data.series}</span>}
       {post.data.tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
     </div>
   </a>
-  {featured && <div class="course-plate" aria-hidden="true"><span>{categoryCode ?? 'NOTE'}</span><strong>{category ?? post.data.series ?? '学习记录'}</strong></div>}
+  {featured && <div class="course-plate" aria-hidden="true"><span>{categoryCode}</span><strong>{category}</strong></div>}
 </article>
 
 <style>
@@ -29,8 +32,9 @@ const categoryCode = post.data.categoryCode ?? post.data.courseCode;
   .kind { padding: 1px 7px; background: var(--accent-soft); color: var(--accent); border-radius: 3px; }
   h3 { margin: 0; font-family: ui-serif, Georgia, "Noto Serif SC", serif; font-size: 1.28rem; line-height: 1.45; }
   p { max-width: 740px; margin: 6px 0 10px; color: var(--muted); font-size: .9rem; line-height: 1.65; }
-  .tags { display: flex; flex-wrap: wrap; align-items: center; }
-  .course { margin-right: 12px; color: var(--warm); font-size: .78rem; font-weight: 700; }
+  .tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .category { color: var(--warm); font-size: .78rem; font-weight: 750; }
+  .series { color: var(--accent); font-size: .78rem; font-weight: 700; }
   .featured { display: grid; grid-template-columns: minmax(0, 1fr) 210px; align-items: stretch; gap: 32px; padding: 0; border: 1px solid var(--line); background: var(--surface); }
   .featured .row-main { padding: 30px; }
   .featured h3 { font-size: 1.55rem; }

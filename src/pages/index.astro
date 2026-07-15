@@ -3,9 +3,11 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostRow from '../components/PostRow.astro';
 import { site } from '../site.config';
+import { getPostCategory, primaryCategories } from '../lib/taxonomy';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const categories = [...new Set(posts.map((post) => post.data.category ?? post.data.course).filter(Boolean))];
+const activeCategories = new Set(posts.map((post) => getPostCategory(post.data)));
+const categories = primaryCategories.map((category) => ({ ...category, count: posts.filter((post) => getPostCategory(post.data) === category.name).length }));
 ---
 
 <BaseLayout>
@@ -18,12 +20,12 @@ const categories = [...new Set(posts.map((post) => post.data.category ?? post.da
     </div>
     <div class="index-board" aria-label="内容统计">
       <div><strong>{String(posts.length).padStart(2, '0')}</strong><span>篇内容</span></div>
-      <div><strong>{String(categories.length).padStart(2, '0')}</strong><span>个分类</span></div>
+      <div><strong>{String(activeCategories.size).padStart(2, '0')}</strong><span>个活跃分类</span></div>
       <p>LAST UPDATED<br /><time>{posts[0]?.data.date.toLocaleDateString('zh-CN') ?? '即将开始'}</time></p>
     </div>
   </section>
 
-  {posts[0] && <section class="shell feature"><div class="section-head"><div><p class="eyebrow">CURRENTLY LEARNING</p><h2 class="section-title">最近在学</h2></div></div><PostRow post={posts[0]} featured /></section>}
+  {posts[0] && <section class="shell feature"><div class="section-head"><div><p class="eyebrow">LATEST NOTE</p><h2 class="section-title">最近写下</h2></div></div><PostRow post={posts[0]} featured /></section>}
 
   <section class="shell recent">
     <div class="section-head"><div><p class="eyebrow">RECENT WRITING</p><h2 class="section-title">最近更新</h2></div><a class="section-link" href="/blog">查看全部 →</a></div>
@@ -32,8 +34,8 @@ const categories = [...new Set(posts.map((post) => post.data.category ?? post.da
 
   <section class="course-band">
     <div class="shell course-inner">
-      <div><p class="eyebrow">CATEGORY INDEX</p><h2 class="section-title">按分类进入</h2><p>课程笔记、会议游记、项目复盘和长期主题，都可以在这里形成各自的路径。</p></div>
-      <div class="course-list">{categories.map((category, index) => <a href={`/courses#${category}`}><span>{String(index + 1).padStart(2, '0')}</span><strong>{category}</strong><i>→</i></a>)}</div>
+      <div><p class="eyebrow">CATEGORY INDEX</p><h2 class="section-title">按分类进入</h2><p>日常记录、学习笔记、研究札记和项目实践，是这座博客暂时的四个入口。</p></div>
+      <div class="course-list">{categories.map((category, index) => <a href={`/categories#${category.name}`}><span>{String(index + 1).padStart(2, '0')}</span><strong>{category.name}</strong><small>{category.count} 篇</small><i>→</i></a>)}</div>
     </div>
   </section>
 </BaseLayout>
@@ -53,9 +55,10 @@ const categories = [...new Set(posts.map((post) => post.data.category ?? post.da
   .course-inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; }
   .course-inner > div > p:last-child { max-width: 420px; color: color-mix(in srgb, var(--bg) 65%, transparent); }
   .course-list { border-top: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
-  .course-list a { display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: center; padding: 18px 0; border-bottom: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
+  .course-list a { display: grid; grid-template-columns: 48px 1fr auto auto; gap: 16px; align-items: center; padding: 18px 0; border-bottom: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
   .course-list span { font: .72rem ui-monospace, monospace; opacity: .6; }
   .course-list strong { font-size: 1rem; }
+  .course-list small { color: color-mix(in srgb, var(--bg) 60%, transparent); }
   .course-list i { font-style: normal; }
   @media (max-width: 760px) {
     .hero { min-height: auto; grid-template-columns: 1fr; gap: 28px; padding-block: 42px 34px; }
