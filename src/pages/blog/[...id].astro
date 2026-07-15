@@ -20,7 +20,12 @@ const kicker = post.data.series ? `${category} · ${post.data.series}` : categor
       <div class="article-kicker">{kicker}</div>
       <h1>{post.data.title}</h1>
       <p class="description">{post.data.description}</p>
-      <div class="article-meta"><time datetime={post.data.date.toISOString()}>{date}</time><span>{post.data.kind === 'note' ? '持续更新' : '完整文章'}</span>{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
+      <div class="article-meta">
+        <time datetime={post.data.date.toISOString()}>{date}</time>
+        <span>{post.data.kind === 'note' ? '持续更新' : '完整文章'}</span>
+        <span id="busuanzi_container_page_pv">阅读 <span id="busuanzi_value_page_pv"></span></span>
+        {post.data.tags.map((tag) => <span>#{tag}</span>)}
+      </div>
     </header>
     <div class="article-grid shell">
       <aside>{headings.length > 0 && <><p>目录</p><nav>{headings.filter((h) => h.depth <= 3).map((h) => <a class={`depth-${h.depth}`} href={`#${h.slug}`}>{h.text}</a>)}</nav></>}</aside>

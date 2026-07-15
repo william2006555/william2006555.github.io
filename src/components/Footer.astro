@@ -4,13 +4,26 @@ import { site } from '../site.config';
 <footer>
   <div class="shell footer-inner">
     <p>把学到的东西留下来。</p>
-    <div><a href="/rss.xml">RSS</a><span>·</span><a href={site.github} target="_blank" rel="noreferrer">GitHub</a></div>
+    <div class="footer-links">
+      <span id="busuanzi_container_site_pv">访问 <span id="busuanzi_value_site_pv"></span></span>
+      <span id="busuanzi_container_site_uv">访客 <span id="busuanzi_value_site_uv"></span></span>
+      <span>·</span>
+      <a href="/rss.xml">RSS</a>
+      <span>·</span>
+      <a href={site.github} target="_blank" rel="noreferrer">GitHub</a>
+    </div>
   </div>
+  <script is:inline async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </footer>
 
 <style>
   footer { margin-top: 90px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
   .footer-inner { min-height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
   p { margin: 0; }
-  div div { display: flex; gap: 10px; }
+  .footer-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+  #busuanzi_container_site_pv, #busuanzi_container_site_uv { display: none; }
+  @media (max-width: 640px) {
+    .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; }
+    .footer-links { justify-content: flex-start; }
+  }
 </style>
